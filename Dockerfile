@@ -1,45 +1,29 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Dockerfile                                         :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: saopaulo42 <saopaulo42@student.42.fr>      +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2020/04/08 23:12:12 by saopaulo42        #+#    #+#              #
-#    Updated: 2020/05/03 19:48:42 by saopaulo42       ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
-#OS
 FROM debian:buster
 
-LABEL verions="1.0.0" maintainer="Gustavo Ariadno"
+# Copying awakening script to container
+COPY ./srcs/setup.sh ./
+COPY ./srcs/start_services.sh ./
 
-#install OS updates/upgrades
-RUN ["apt-get", "update", "-y"]
-RUN ["apt-get", "upgrade", "-y"]
-#install nginx
-RUN ["apt-get", "install", \
-	"nginx", "-y"]
-#delete packages already installed
-RUN ["apt-get", "clean"]
+COPY ./srcs/Wordpress/wp-config.php /tmp/
+COPY ./srcs/Wordpress/latest.tar.gz /tmp/
+COPY ./srcs/PhpMyAdmin/config.inc.php /tmp/
+COPY ./srcs/PhpMyAdmin/phpMyAdmin-4.9.0.1-all-languages.tar.gz /tmp/
 
-ARG SSLPATH=/srcs/ssl
+COPY ./srcs/Nginx/nginx-conf /etc/nginx/sites-available/localhost
 
-#copy ssl certficate and key
-COPY ["$SSLPATH/self-signed.crt", "/etc/ssl/certs/"]
-COPY ["$SSLPATH/self-signed.key", "/etc/ssl/private/"]
+ENV AUTO_INDEX on
 
-#configure nginx
-#RUN ["rm", "-f", "/etc/nginx/sites-enabled/default"]
-#RUN ["rm", "-f", "/etc/nginx/sites-avaible/default"]
-#RUN ["rm", "-rf", "/var/www/html"]
+# Install OS updates, softwares and clean
+RUN apt-get update && apt-get upgrade -y; \
+	apt-get install -y \
+	nginx \
+	openssl \
+	default-mysql-server \
+	php7.3 php-mysql php-fpm php-cli php-mbstring; \
+	apt-get clean
+RUN /setup.sh
 
-#put the script to initiate the container
-COPY ["./srcs/the_wake.sh", "/"]
-
-#the container gonna be exposed on 80 and 443 port
+# The container gonna be exposed on 80 and 443 ports
 EXPOSE 80/tcp 443/tcp
-
-
-
+# Awakening the container
+ENTRYPOINT ["sh", "start_services.sh"]
