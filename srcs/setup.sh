@@ -1,10 +1,14 @@
 #!/bin/bash
 
-# MySQL configure
-echo "CREATE DATABASE wordpress;" | mysql -u root --skip-password
-echo "UPDATE mysql.user SET plugin = 'mysql_native_password' WHERE user='root';" | mysql -u root --skip-password
-echo "GRANT ALL PRIVILEGES ON wordpress.* to 'root'@'localhost';" |  mysql -u root --skip-password
-echo "FLUSH PRIVILEGES" | mysql -u root --skip-password
+# Config access
+chown -R www-data:www-data /var/www/*
+chmod -R 755 /var/www/*
+
+# SSL key and certificate
+mkdir /etc/nginx/ssl
+openssl req -x509 -newkey rsa:4096 -sha256 -days 365 -nodes \
+        -out /etc/nginx/ssl/localhost.pem -keyout /etc/nginx/ssl/localhost.key \
+        -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=42 Sao Paulo/OU=gariadno/CN=localhost"
 
 # PhpMyAdmin configure
 mkdir -p /var/www/localhost/phpmyadmin
@@ -24,13 +28,3 @@ then
     sed -i "/autoindex/ s/on\|off/$AUTO_INDEX/" /etc/nginx/sites-enabled/localhost
     echo "Autoindex is $AUTO_INDEX now"
 fi
-
-# SSL key and certificate
-mkdir /etc/nginx/ssl
-openssl req -x509 -newkey rsa:4096 -sha256 -days 365 -nodes \
-        -out /etc/nginx/ssl/localhost.pem -keyout /etc/nginx/ssl/localhost.key \
-        -subj "/C=BR/ST=Sao Paulo/L=Sao Paulo/O=42 Sao Paulo/OU=gariadno/CN=localhost"
-
-# Config access
-chown -R www-data:www-data /var/www/*
-chmod -R 755 /var/www/*
