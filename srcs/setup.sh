@@ -22,11 +22,10 @@ openssl req -x509 -newkey rsa:4096 -sha256 -days 365 -nodes \
 
 # MySQL configure
 service mysql start
-echo "CREATE DATABASE wordpress;" | mysql -u root --skip-password
-echo "UPDATE mysql.user SET plugin = 'mysql_native_password' WHERE user='root';" | mysql -u root --skip-password
-echo "GRANT ALL PRIVILEGES ON wordpress.* to 'root'@'localhost';" |  mysql -u root --skip-password
-echo "FLUSH PRIVILEGES" | mysql -u root --skip-password
-#service mysql stop
+mysql -e "CREATE DATABASE wordpress;"
+mysql -e "UPDATE mysql.user SET plugin = 'mysql_native_password' WHERE USER = 'root';"
+mysql -e "GRANT ALL PRIVILEGES ON wordpress.* TO 'root'@'localhost';"
+mysql -e "FLUSH PRIVILEGES"
 
 # Nginx configure
 ln -s /etc/nginx/sites-available/localhost /etc/nginx/sites-enabled/
