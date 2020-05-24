@@ -23,8 +23,9 @@ openssl req -x509 -newkey rsa:4096 -sha256 -days 365 -nodes \
 # MySQL configure
 service mysql start
 mysql -e "CREATE DATABASE wordpress;"
-mysql -e "UPDATE mysql.user SET plugin = 'mysql_native_password' WHERE USER = 'root';"
-mysql -e "GRANT ALL PRIVILEGES ON wordpress.* TO 'root'@'localhost';"
+#mysql -e "UPDATE mysql.user SET plugin = 'mysql_native_password' WHERE USER = 'root';"
+mysql -e "UPDATE user set authentication_string=password('123') WHERE USER = 'root';"
+mysql -e "GRANT ALL PRIVILEGES ON wordpress.* TO 'root'@'localhost' IDENTIFIED BY '123' WITH GRANT OPTION;"
 mysql -e "FLUSH PRIVILEGES"
 
 # Nginx configure
