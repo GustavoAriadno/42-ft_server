@@ -28,6 +28,7 @@ mysql -e "GRANT ALL PRIVILEGES ON wordpress.* TO 'root'@'localhost' WITH GRANT O
 mysql -e "FLUSH PRIVILEGES"
 
 # Nginx configure
+mv /tmp/nginx-conf /etc/nginx/sites-available/localhost
 ln -s /etc/nginx/sites-available/localhost /etc/nginx/sites-enabled/
 rm -rf /etc/nginx/sites-enabled/default
 if [ "$AUTO_INDEX" == "on" ] || [ "$AUTO_INDEX" == "off" ];
